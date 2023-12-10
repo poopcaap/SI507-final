@@ -217,7 +217,7 @@ while True:
                     # recreate string
                     result_km = result.replace(f"{distance_str} mi", f"{round(kilometers, 2)} km")
                     print(result_km)
-                    print('\n')
+                print('\n')
             elif option_choice == '4':
                 create_map(search_results)
                 print("Successfully load as map.html\n")
