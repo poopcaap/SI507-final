@@ -26,3 +26,15 @@ After forming the result, you can do following option:
 4 create a map showing routes
 
 5 exit the program.
+
+<img width="1119" alt="search4" src="https://github.com/poopcaap/SI507-final/assets/143746602/ad8b7b38-8f70-4bef-816f-48b0f00055a3">
+
+<img width="1120" alt="search5" src="https://github.com/poopcaap/SI507-final/assets/143746602/aa158995-47f8-4ad1-99a0-3c67a7efdb7c">
+
+<img width="720" alt="search3" src="https://github.com/poopcaap/SI507-final/assets/143746602/958ad8b4-bdb9-4782-a294-5bf0c7876d74">
+
+The second and third option offers a search program of airline code and airport code if someone don't know what the code of airline and airport is. It offers fuzzy search that you can type part of the result.
+
+<img width="1120" alt="search6" src="https://github.com/poopcaap/SI507-final/assets/143746602/6612f6c9-1321-45b8-a007-b85ae6bc675f">
+
+That's all of my project, Thank you!
