@@ -1,1 +1,1 @@
-
+The sample of output
