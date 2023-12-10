@@ -1,5 +1,5 @@
 # SI507-final
-To begin this program, you can download search.py and the json directory. command 'python search.py' to start the program.
+To begin this program, you can download main.py and the json directory. command 'python main.py' to start the program.
 
 The program will show:
 
