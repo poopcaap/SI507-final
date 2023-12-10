@@ -7,7 +7,7 @@ def build_search_tree(data):
         airline = entry['airline']
         departure = entry['departure']
         planes = entry['planes']
-        # 将距离从公里转换为英里
+        # turn mile to km
         distance = entry['distance'] * 0.621371
 
         if airline not in tree:
@@ -16,7 +16,7 @@ def build_search_tree(data):
             tree[airline][departure] = {}
 
         for plane in planes:
-            # 根据距离分级
+            # level by distance
             if distance <= 650:
                 distance_category = "1-650"
             elif distance <= 1150:
@@ -42,7 +42,7 @@ def build_search_tree(data):
     return tree
 
 def get_plane_model_variants(model):
-    # 如果输入模型以'7'开头且长度为3，则生成以前两个字符开头的模型列表
+    # if input is in form of 7x7,3x0, then output all the 7x- and 3x-(they are the same in aircraft defining)
     if len(model) == 3 and model[0] == '7' and model[2] == '7':
         base_model = model[:2]
         model_variants = [base_model + str(i) for i in range(10)]  # 7x0到7x9
@@ -60,15 +60,15 @@ def get_plane_model_variants(model):
 def search_routes(tree, airline, departure, plane_model, distance_code):
     results = []
 
-    # 将输入值标准化为大写
+    # turn input to upper case
     normalized_airline = airline.upper() if airline else None
     normalized_departure = departure.upper() if departure else None
     normalized_distance_code = distance_code.upper() if distance_code else None
 
-    # 获取飞机型号变体
+    # get the variant of plane model
     model_variants = get_plane_model_variants(plane_model.upper()) if plane_model and plane_model.upper() != "ANY" else None
 
-    # 距离代码到距离范围的映射
+    # distance-A~F
     distance_categories = {
         "A": "1-650",
         "B": "651-1150",
@@ -79,7 +79,7 @@ def search_routes(tree, airline, departure, plane_model, distance_code):
     }
     distance_category = distance_categories.get(normalized_distance_code, None) if normalized_distance_code != "ANY" else None
 
-    # 遍历搜索树
+    # go through search tree
     for airline_key, departures in tree.items():
         if normalized_airline and airline_key != normalized_airline and normalized_airline != "ANY":
             continue
@@ -98,17 +98,17 @@ def search_routes(tree, airline, departure, plane_model, distance_code):
                     result = f"{airline_key} {departure_key}-{route['arrival']} distance:{route['distance']} mi plane:{route['plane']}"
                     results.append(result)
 
-    # 排序并返回结果
+    # rank and return result
     return sorted(results, key=lambda x: float(x.split('distance:')[1].split(' ')[0]))
 
 def get_sort_key(method, result):
-    if method == '2':  # 按航空公司排序
+    if method == '2':  # rank by airline
         return result.split()[0]
-    elif method == '3':  # 按出发地排序
+    elif method == '3':  # rank by departure
         return result.split()[1].split('-')[0]
-    elif method == '4':  # 按飞机型号排序
+    elif method == '4':  # rank by plane model
         return result.split('plane:')[1]
-    else:  # 默认按距离排序
+    else:  # rank by distance(default)
         return float(result.split('distance:')[1].split(' ')[0])
 
 def search_airline_codes(airlines, query):
@@ -160,24 +160,24 @@ def create_map(search_results):
 while True:
     choice = input("Select option (1: Route Search, 2: Airline Code Search, 3: Airport Code Search, 4: Exit): ").strip()
 
-    # 读取JSON数据
+    # read json data
     if choice == '1':
         with open('json/processed_routes_with_distance.json', 'r') as file:
             routes_data = json.load(file)
 
-        # 构建搜索树
+        # create search tree
         search_tree = build_search_tree(routes_data)
 
-        # 交互式搜索
+        # interactive search
         airline_input = input("Enter airline code or 'any': ").strip()
         departure_input = input("Enter departure code or 'any': ").strip()
         plane_input = input("Enter plane model (e.g., 320, 330, 7x7) or 'any': ").strip()
         distance_code_input = input("Enter distance category (A: 1-650, B: 651-1150, C: 1151-2000, D: 2001-4000, E: 4001-7000, F: 7000+) or 'any': ").strip()
 
-        # 执行搜索
+        # do the search
         search_results = search_routes(search_tree, airline_input, departure_input, plane_input, distance_code_input)
 
-        # 展示初始搜索结果
+        # show search result
         print("Initial Search Results:")
         for result in search_results:
             print(result)
@@ -192,7 +192,7 @@ while True:
             option_choice = input("Choose an option: ").strip()
 
             if option_choice == '1':
-                break  # 返回到循环的开始
+                break  # return to loop start
             elif option_choice == '2':
                 sorting_method_input = input("Choose sorting method (1: Distance, 2: Airline, 3: Departure, 4: Plane Model): \n").strip()
                 sorted_search_results = sorted(search_results, key=lambda x: get_sort_key(sorting_method_input, x))
@@ -203,18 +203,18 @@ while True:
             elif option_choice == '3':
                 print("Converted Search Results (Miles to Kilometers):")
                 for result in search_results:
-                    # 分割字符串以获取距离值
+                    # split string to get value
                     distance_str = result.split('distance:')[1].split(' ')[0]
                     try:
-                        # 尝试将距离值转换为浮点数
+                        # transfer mile
                         miles = float(distance_str)
                     except ValueError:
-                        # 如果转换失败，跳过当前结果
+                        # jump result if transfer fail
                         print("Could not convert:", result)
                         continue
 
-                    kilometers = miles * 1.60934  # 转换为公里
-                    # 重新构建结果字符串
+                    kilometers = miles * 1.60934  # transfer to km
+                    # recreate string
                     result_km = result.replace(f"{distance_str} mi", f"{round(kilometers, 2)} km")
                     print(result_km)
                     print('\n')
@@ -223,16 +223,16 @@ while True:
                 print("Successfully load as map.html\n")
             elif option_choice == '5':
                 print("Exiting program.")
-                exit()  # 退出程序
+                exit()  # exit program
             else:
                 print("Invalid option. Please choose again.")
 
     elif choice == '2':
-        # 航空公司代码搜索功能
+        # program of airline company search
         query = input("Enter partial airline name to search: ").strip()
         search_results = search_airline_codes(airlines_data, query)
 
-        # 展示航空公司搜索结果
+        # show result of airline search
         if search_results:
             print("Matching Airlines:")
             for name, code in search_results:
@@ -242,11 +242,11 @@ while True:
             print("No matching airlines found.\n")
 
     elif choice == '3':
-        # 航空公司代码搜索功能
+        # program of airport search
         query = input("Enter partial airport name to search: ").strip()
         search_results = search_airline_codes(airports_data, query)
 
-        # 展示航空公司搜索结果
+        # show result of airport search
         if search_results:
             print("Matching Airlines:")
             for name, code in search_results:
@@ -256,7 +256,7 @@ while True:
             print("No matching airlines found.\n")
 
     elif choice == '4':
-    # 退出程序
+    # exit program
         print("Exiting program.")
         break
 
